@@ -104,7 +104,7 @@ def arrowview(strokepath):
 
 def mainview(strokepath):
 
-	arrowview(strokepath)
+	#arrowview(strokepath)
 
 	strokefile = open(strokepath, "r")
 
@@ -136,7 +136,7 @@ def mainview(strokepath):
 		if term != "/":
 			temp+= term
 
-	plt.savefig( "images/" + temp.strip(".txt") + "_")
+	plt.savefig( temp.rstrip(".tif.txt"))
 
 # for i in range(1,50):
 # 	i = i*2

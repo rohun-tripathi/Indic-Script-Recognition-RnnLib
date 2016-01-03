@@ -197,10 +197,9 @@ def trial(path, strokepath, k, rejects, debug = False):
 		#VW.mainview(strokepath)
 
 	text.close()
-	
-	
 
-# filename = "Banfile0_5_10.tif"
+# filename = "file0_0_1.tif"
 
-# sizes = open("tempsizes.txt", "w")
-# trial(filename, filename.rstrip(".tif") + "_stroke.txt", sizes )
+# sizes = open("AAtempsizes.txt", "w")
+# rejects = open("AAtemprejects.txt", "w")
+# trial(filename, filename.rstrip(".tif") + "_stroke.txt", sizes, rejects )

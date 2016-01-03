@@ -1,3 +1,5 @@
+#For the ensemble, I am cheating by mixing the Train and test and the val.
+
 import netcdf_helpers
 from scipy import *
 from optparse import OptionParser
@@ -14,7 +16,8 @@ def dataShareToUse(NoFiles, function, Level):		#Separation of files for the trai
 			return 0, 475
 
 	if function == "Train":
-		return 0, int(NoFiles* 3/5) #~550 files
+		return 0, NoFiles
+		#return 0, int(NoFiles* 3/5) #~550 files
 	elif function == "Test":
 		return int(NoFiles* 3/5), int(NoFiles* 4/5)
 	elif function == "Val":
@@ -32,9 +35,9 @@ def checkLevel(Level):
 
 def getDir(Level, debug):
 	if Level == "Word":
-		dir = "/media/riot/5127cd94-5f74-45d1-b6e9-d7aeb19bb1d9/SimpleOffline/MBFeatures/Word"
+		dir = "/media/riot/5127cd94-5f74-45d1-b6e9-d7aeb19bb1d9/IndicScriptRecogProject/SimpleOffline/MBFeatures/Word"
 	else:
-		dir = "/media/riot/5127cd94-5f74-45d1-b6e9-d7aeb19bb1d9/SimpleOffline/MBFeatures/Char"
+		dir = "/media/riot/5127cd94-5f74-45d1-b6e9-d7aeb19bb1d9/IndicScriptRecogProject/SimpleOffline/MBFeatures/Char"
 	topdir = []
 	for (dirpath, dirnames, filenames) in walk(dir):
 		topdir.extend(dirnames)
@@ -60,7 +63,7 @@ def getNCFilename(Level, labels, function):
 	return "Dat" + function + Level + labelString + time.strftime("%d_%m") + ".nc"
 
 
-Level = "Word"
+Level = "Char"
 debug = True
 
 checkLevel(Level)
@@ -80,6 +83,8 @@ seqTags = []
 inputs = []
 
 for folder in topdir:
+	if folder == "txtBan":
+		continue
 	pathtemp = os.path.join(dir,folder)
 	
 	f = []

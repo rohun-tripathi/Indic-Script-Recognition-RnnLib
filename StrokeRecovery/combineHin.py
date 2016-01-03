@@ -6,11 +6,7 @@ from optparse import OptionParser
 from xml.dom.minidom import parse
 import sys, time, os
 
-# import tamil_extract as TE
-import bangla_extract as BE
-
-import hindi_extract as HE
-import english_extract as EE
+import code.language_extract as LE
 
 #command line options
 parser = OptionParser()
@@ -23,7 +19,7 @@ if not function in ["test",  "train", "val"]:
 	print "usage: test/train/val"
 	sys.exit(2)
 
-labels =  ["hindi", "bangla"]
+labels =  ["hindi", "bangla", "english"]
 
 seqDims = []
 seqLengths = []
@@ -32,32 +28,22 @@ wordTargetStrings = []
 seqTags = []
 inputs = []
 
-# inputenglish = []
-# EE.main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTags, inputenglish, True)
+for label in labels:
 
-# inputMeans = array([ 20.3063709272 ,  18.1954686218 ,  0.0207776395543 ])
-# inputStds = array([ 14.4594023607 ,  13.4718222236 ,  0.142639157488 ]) 
-
-# inputenglish = ((array(inputenglish)-inputMeans)/inputStds).tolist()
-# inputs.extend(inputenglish)
-
-
-inputhindi = []
-HE.main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTags, inputhindi, True)
-inputMeans = array([ 115.204268789 ,  118.781161714 ,  0.0306033398908 ])
-inputStds = array([ 94.3599554363 ,  86.7815331607 ,  0.172240458309 ]) 
-
-inputhindi = ((array(inputhindi)-inputMeans)/inputStds).tolist()
-inputs.extend(inputhindi)
-
-
-
-inputbangla = []
-BE.main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTags, inputbangla, True)
-inputMeans = array([ 27.7758812741 ,  38.49031808 ,  0.0171472934505 ])
-inputStds = array([ 20.952996415 ,  23.1016430872 ,  0.129820120851 ]) 
-inputbangla = ((array(inputbangla)-inputMeans)/inputStds).tolist()
-inputs.extend(inputbangla)
+	if label == "bangla":
+		inputMeans = array([ 29.9574801796 ,  39.3277184539 ,  0.0171024643878 ])
+		inputStds = array([ 21.682325964 ,  23.5297621524 ,  0.129653268758 ])
+	if label == "english":
+		inputMeans = array([ 20.1197738962 ,  18.102001324 ,  0.0201660131385 ])
+		inputStds = array([ 14.078078879 ,  13.190027056 ,  0.140567937498 ])
+	if label == "hindi":
+		inputMeans = array([ 131.496914426 ,  134.551279828 ,  0.0062047164797 ])
+		inputStds = array([ 96.342533732 ,  90.7312127862 ,  0.0785252696468 ])
+ 
+	inputlanguage = []
+	LE.main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTags, inputlanguage, label, False)
+	inputlanguage = ((array(inputlanguage)-inputMeans)/inputStds).tolist()
+	inputs.extend(inputlanguage)
 
 #create a new .nc file
 ncFilename = "combine" + function + ".nc"

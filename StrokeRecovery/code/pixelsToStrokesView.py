@@ -92,7 +92,9 @@ for r,d,f in os.walk(path):
 	break
 
 for i, f in enumerate(files):
-	if i > 10:
+	if i < 7:
+		continue
+	if i > 17:
 		break
 	filepath = os.path.join(path,f)
 	print "File Drawn == ", filepath

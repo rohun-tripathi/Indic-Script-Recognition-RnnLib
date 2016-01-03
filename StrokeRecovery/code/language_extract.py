@@ -1,17 +1,35 @@
 import sys, time, os
 from os import walk
 
-def unnecessaryfunc(NoFolders, function):		#Separation of files for the train/test/val so on
-	if function == "train":
-		return 0, int(NoFolders * 10 / 11) 
-	elif function == "test":					#This folder is all for testing
-		return 0, NoFolders						#~100
+def dataShareToUse(NoFolders, function, labelName = ""):		#Separation of files for the train/test/val so on
+	if labelName == "bangla":
+		if function == "train":
+			return 0, int(NoFolders * 10 / 11) 
+		elif function == "test":					#This folder is all for testing
+			return 0, NoFolders						#~100
+	if labelName == "english":
+		if function == "train":
+			return 0, int(NoFolders * 10 / 11) 
+		elif function == "test":					#This folder is all for testing
+			return 0, NoFolders						#~100
+	if labelName == "hindi":
+		if function == "train":
+			return 0, int(NoFolders * 10 / 11) 
+		elif function == "test":					#This folder is all for testing
+			return 0, NoFolders						#~100
+		
+def getPathName(labelName):
+	defPath = "/media/riot/5127cd94-5f74-45d1-b6e9-d7aeb19bb1d9/DataSets/OfflineCharLevelStrokesRetrieved/"
+	if labelName == "bangla":
+		return defPath + "strokesBan/"
+	if labelName == "english":
+		return defPath + "strokesEng/"
+	if labelName == "hindi":
+		return defPath + "strokesHin/"
 
+def main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTags, inputs, labelName = "", debug = False):
+	pathname = getPathName(labelName)
 
-def main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTags, inputs, debug = False):
-	labelname = "bangla"
-	pathname = "StrokeData/txtBan/"
-	
 	print "Starting work in ", pathname
 	time.sleep(2)
 
@@ -19,7 +37,8 @@ def main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings
 	for (dirpath, dirnames,filenames) in walk(pathname):	
 		f.extend(filenames)
 		break
-	start,end = unnecessaryfunc(len(f),function)
+	start,end = dataShareToUse(len(f),function, labelName)
+	print start, end
 
 	for index, onefile in enumerate(f[start:end]):				#Running for each data file
 		
@@ -28,8 +47,8 @@ def main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings
 
 		if debug == True: print onefile
 		
-		word = labelname
-		wordmod = labelname
+		word = labelName
+		wordmod = labelName
 		
 		firstlinechk = 0 			# To make sure that the lines of code before the data lines are avoided when necessary
 		oldlen = len(inputs)
@@ -65,12 +84,13 @@ def main(function, labels, seqDims, seqLengths, targetStrings, wordTargetStrings
 			if debug == True: print "Sequence lengths ", [seqLengths[-1]], "\n"
 			if seqLengths[-1] == 0:
 				raw_input("The seqLengths for this instance is zero.\nThis should not have happened and will cause errors later (core dump while training).\nProceed with caution.")
+		else:
+			print onefile, " has no data at all\n"
 		#here the iteration for this file ends
 
-def meancal(xterms, yterms, xrang, yrang, pendownterms, debug = False):
-	labelname = "bangla"
-	pathname = "StrokeData/txtBan/"
-	
+def meancal(xterms, yterms, xrang, yrang, pendownterms, labelName = "", debug = False):
+	pathname = getPathName(labelName)
+
 	f = []
 	for (dirpath, dirnames,filenames) in walk(pathname):	
 		f.extend(filenames)

@@ -2,7 +2,7 @@
 #This is the start point of our stroke recovery code.
 #This calls the file which recursively enters folders and generates the Strokes for each image file
 
-import os, sys, time
+import os, sys, time, re
 import pixelsToStrokes as MN
 from os import walk
 
@@ -10,19 +10,18 @@ def FilesFromEach (num, MaxForthisFolder):
 	if num == 0:
 		print "The number of folders is zero somewhere. Exiting"
 		sys.exit(0)
-	return MaxForthisFolder / num
+	return MaxForthisFolder/num
 
-def resursiveStrokeRecovery():
-	MaxFilesFromEachLang = 500
+def resursiveStrokeRecovery(inputdir, outputdir):
+	MaxFilesFromEachLang = 50000
 	#This is to be kept true whenever the format of data has not been changed. Then we will only ADD to the existing txt files
 	filereuse = True
 
-	dir = os.curdir;
+	dir = inputdir;
 
-	folders = ['blackBan' ]
+	folders = ['blackBan', 'blackHin', 'blackEng']
 	# folders = ['blackEngWord', "blackHinWord"]
-	# folders = ['blackEng']
-
+	
 	sizes = open("sizes.txt", "w")
 	rejects = open("rejects.txt", "w")
 
@@ -68,7 +67,8 @@ def resursiveStrokeRecovery():
 					if not ".bmp" in filepath and not ".tiff" in filepath and not ".tif" in filepath:
 						continue
 					fileNo += 1
-					outpath = "StrokeData/" + "txt" +  folder.strip("black") + "/" + onefile.strip(".tif") + ".txt"
+					outpath = outputdir.rstrip("/") + "/" + "strokes" +  folder.strip("black") + "/" + onefile + ".txt"
+					print onefile
 					if not os.path.exists(outpath) or filereuse == False:
 						# print filepath
 						MN.trial (filepath, outpath, sizes, rejects)
