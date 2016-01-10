@@ -93,7 +93,7 @@ for folder in topdir:
 		break
 	
 	start, end = dataShareToUse( len(f) , function, Level)
-
+	f.sort()	#List of Strings. Sorts by name
 	for index, onefile in enumerate(f[start:end]):
 		filepath = os.path.join(pathtemp,onefile)
 

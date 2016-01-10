@@ -1,7 +1,7 @@
 import sys, time, os, numpy
 from optparse import OptionParser
 
-import code.language_extract as LE
+import code.lang_extract_recStrokes as LE
 
 def cal():
 	f1 = open("details_mean_lang" + ".txt", 'w')
