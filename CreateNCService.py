@@ -1,43 +1,19 @@
 import sys, time, os
 from os import walk
 
-def dataShareToUse(NoFolders, function, labelName = ""):		#Separation of files for the train/test/val so on
-	if labelName == "bangla":
-		if function == "train":
-			return 0, int(NoFolders * 10 / 11) 
-		elif function == "test":					#This folder is all for testing
-			return 0, NoFolders						#~100
-	if labelName == "english":
-		if function == "train":
-			return 0, int(NoFolders * 10 / 11) 
-		elif function == "test":					#This folder is all for testing
-			return 0, NoFolders						#~100
-	if labelName == "hindi":
-		if function == "train":
-			return 0, int(NoFolders * 10 / 11) 
-		elif function == "test":					#This folder is all for testing
-			return 0, NoFolders						#~100
+import InfoForDifferentFolders as ID
 		
-def getPathName(labelName):
-	defPath = "/media/riot/5127cd94-5f74-45d1-b6e9-d7aeb19bb1d9/DataSets/OfflineCharLevelStrokesRetrieved/"
-	if labelName == "bangla":
-		return defPath + "strokesBan/"
-	if labelName == "english":
-		return defPath + "strokesEng/"
-	if labelName == "hindi":
-		return defPath + "strokesHin/"
+def main(function, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTags, inputs, labelName, level, dataSource, debug = False):
+	pathname, inputMeans, inputStds = ID.getPathName(labelName, level, dataSource)
 
-def main(function, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTags, inputs, labelName = "", debug = False):
-	pathname = getPathName(labelName)
-
-	print "pathname and LabelName == ", pathname, labelName
-	time.sleep(2)
+	print "pathname and LabelName == ", pathname, labelName, inputMeans, inputStds
+	time.sleep(5)
 
 	f = []
 	for (dirpath, dirnames,filenames) in walk(pathname):	
 		f.extend(filenames)
 		break
-	start,end = dataShareToUse(len(f),function, labelName)
+	start,end = ID.dataShareToUse(len(f),function, labelName, level, dataSource)
 	print start, end
 
 	for index, onefile in enumerate(f[start:end]):				#Running for each data file
@@ -87,6 +63,7 @@ def main(function, seqDims, seqLengths, targetStrings, wordTargetStrings, seqTag
 		else:
 			print onefile, " has no data at all\n"
 		#here the iteration for this file ends
+	return inputMeans, inputStds
 
 def meancal(xterms, yterms, xrang, yrang, pendownterms, labelName = "", debug = False):
 	pathname = getPathName(labelName)
