@@ -1,3 +1,7 @@
 All have Pen Down in all the datasets with stroke data.
 
 All have same orientations.
+
+This works -
+    python pixelsToStrokesView.py
+        Enter start point of folder : OfflineCharLevelStrokesRetrieved/

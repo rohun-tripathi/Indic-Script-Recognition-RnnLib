@@ -1,7 +1,11 @@
+# This file is only python 3 compatible
+
 import glob
 import os
 import random
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
@@ -68,7 +72,7 @@ def add_arrow_to_line2D(
     return arrows
 
 
-def arrow_view(strokepath, jump_points, arrow_size):
+def arrow_view(strokepath, jump_points, arrow_size, output_path):
     strokefile = open(strokepath, "r")
 
     first = ["r", "g", "b"]
@@ -103,35 +107,10 @@ def arrow_view(strokepath, jump_points, arrow_size):
             x.append(int(coor[0]))
             y.append(int(coor[1]))
 
-    export_to_image(strokepath, "_arrow_" + str(jump_points) + "_" + str(arrow_size), fig)
+    export_to_image(strokepath, "_arrow_" + str(jump_points) + "_" + str(arrow_size), fig, output_path)
 
 
-def normal_view(stroke_path):
-    stroke_data = open(stroke_path, "r").readlines()
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    x = []
-    y = []
-    for line in stroke_data:
-        line = line.strip()
-        if line == ".PEN_DOWN" or line == ".PEN_UP":
-
-            if len(x) > 1:
-                ax.plot(x, y, "b-")
-            x = []
-            y = []
-
-            continue
-        else:
-            coor = line.split()
-            x.append(int(coor[0]))
-            y.append(int(coor[1]))
-
-    export_to_image(stroke_path, "_variation_normal", fig)
-
-
-def color_view(stroke_path):
+def color_view(stroke_path, output_path):
     stroke_data = open(stroke_path, "r").readlines()
 
     first = ["r", "g", "b", "c", "k"]
@@ -159,39 +138,81 @@ def color_view(stroke_path):
                 x.append(int(coor[0]))
                 y.append(int(coor[1]))
 
-        export_to_image(stroke_path, "_variation_" + str(index), fig)
+        export_to_image(stroke_path, "_variation_" + str(index), fig, output_path)
 
 
-def export_to_image(stroke_path, tag, fig):
+def normal_view(stroke_path, output_path):
+    stroke_data = open(stroke_path, "r").readlines()
+
+    x = []
+    y = []
+
+    min_distance, min_x, min_y, selection_folder = 10e10, -1, -1, "correct"
+
+    for line in stroke_data:
+        line = line.strip()
+        if line == ".PEN_DOWN" or line == ".PEN_UP":
+
+            if len(x) > 1:
+                plt.plot(x, y, "b-")
+
+                if x[0] * x[0] + y[0] * y[0] < min_distance:
+                    min_distance, min_x, min_y, selection_folder = x[0] * x[0] + y[0] * y[0], x[0], y[0], "correct"
+
+                if len(x) > 2 and x[-1] * x[-1] + y[-1] * y[-1] < min_distance:
+                    min_distance, min_x, min_y, selection_folder = x[-1] * x[-1] + y[-1] * y[-1], x[-1], y[-1], "wrong"
+
+            x = []
+            y = []
+
+            continue
+        else:
+            coor = line.split()
+            x.append(int(float(coor[0])))
+            y.append(int(float(coor[1])))
+
+    export_to_image(stroke_path, "_variation_normal", plt, join(output_path, selection_folder))
+    plt.clf()
+
+
+
+def export_to_image(stroke_path, tag, fig, output_path):
     # Split by whatever is the system path delimiter
     directory, file_name = os.path.split(stroke_path)
 
     fig.savefig(join(output_path, file_name.rstrip(".tif.txt") + tag + ".png"))
 
 
-output_path = "/media/riot/5127cd94-5f74-45d1-b6e9-d7aeb19bb1d9/versions_of_projects/scriptRepo/IndicScriptRecogProject/stroke_to_images/"
-try:
-    os.makedirs(output_path)
-except OSError:
-    pass
+if __name__ == '__main__':
 
-image_path_list = [{"path" : global_constants.offline_word_ban_data_set, "filter" : "Image1."}]
-image_path_list.append({"path" : global_constants.offline_word_eng_data_set, "filter" : "file8_24_3."})
-image_path_list.append({"path" : global_constants.offline_word_hin_data_set, "filter" : "file0_0_110."})
+    output_path = "revision_data/stroke_to_images/"
 
-for image_dictionary in image_path_list:
+    # image_path_list = [{"path" : global_constants.offline_word_ban_data_set, "filter" : "Image1."}]
+    # image_path_list.append({"path" : global_constants.offline_word_eng_data_set, "filter" : "file8_24_3."})
+    # image_path_list.append({"path" : global_constants.offline_word_hin_data_set, "filter" : "file0_0_110."})
 
-    image_files = glob.glob(join(image_dictionary["path"], "*" + image_dictionary["filter"] + "*"))
+    image_path_list = [{"path" : global_constants.online_char_hin_data, "filter": "file", "output": "char_hin"},
+                       {"path" : global_constants.online_char_eng_data, "filter": "img", "output": "char_eng"}]
 
-    for index, input_image in enumerate(image_files):
-        normal_view(input_image)
+    number_to_output = 1000
 
-        for jump_points in [5]:
-            arrow_view(input_image, jump_points=jump_points, arrow_size=2)
-            arrow_view(input_image, jump_points=jump_points, arrow_size=2.5)
-            arrow_view(input_image, jump_points=jump_points, arrow_size=3)
+    for image_dictionary in image_path_list:
+        image_files = glob.glob(join(image_dictionary["path"], "**", "*" + image_dictionary["filter"] + "*"), recursive=True)
+        if len(image_files) != 0:
+            os.makedirs(join(output_path, image_dictionary['output'], "correct"), exist_ok=True)
+            os.makedirs(join(output_path, image_dictionary['output'], "wrong"), exist_ok=True)
 
-        # color_view(input_image)
+        sorted_image_files = sorted(image_files)
+        random.seed(0)
+        random.shuffle(sorted_image_files)
 
-        if index > 1:
-            break
+        for index, input_image in enumerate(sorted_image_files):
+            if index%100 ==0:
+                print(image_dictionary["output"], index, number_to_output)
+            normal_view(input_image, join(output_path, image_dictionary['output']))
+
+            # arrow_view(input_image, jump_points=5, arrow_size=2, output_path)
+            # color_view(input_image, output_path)
+
+            if index >= number_to_output:
+                break
